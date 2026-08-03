@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Farm Controller</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI;
+}
+
+body{
+background:#c7d4dd;
+display:flex;
+justify-content:center;
+padding:30px;
+}
+
+.phone{
+width:390px;
+background:rgb(135,134,155);
+border-radius:25px;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,.25);
+}
+
+.header{
+background:#2c247a;
+color:white;
+padding:25px;
+text-align:center;
+}
+
+.content{
+padding:20px;
+}
+
+.card{
+background:#fafafa;
+border-radius:15px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.card h3{
+margin-bottom:15px;
+color:#333;
+}
+
+.sensor{
+display:flex;
+justify-content:space-between;
+margin:12px 0;
+font-size:17px;
+}
+
+.green{
+color:#00c853;
+font-weight:bold;
+}
+
+.red{
+color:#d32f2f;
+font-weight:bold;
+}
+
+.bigButton{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+background:#0603c0;
+color:white;
+margin-top:10px;
+}
+
+.stopButton{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+background:#d32f2f;
+color:white;
+margin-top:10px;
+}
+
+.zone{
+margin:12px 0;
+font-size:17px;
+}
+
+.footer{
+padding:10px;
+text-align:center;
+color:#383838;
+font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="header">
+
+<h1>🌱 Smart Farm 🌱</h1>
+<h4>ฟาร์มอัจฉริยะ By TAMCO</h4>
+
+<h6>Wi-Fi : TAMCO</h6>
+<h6>Bluetooth : TAMCO.BT</h6>
+
+<span class="green">Connected</span>
+
+</div>
+
+<div class="content">
+
+<!-- Pump -->
+
+<div class="card">
+
+<h3>Water Pump</h3>
+
+<div class="zone">
+<label>
+<input type="checkbox" id="pump1">
+Pump 1 (Zone A)
+</label>
+</div>
+
+<div class="zone">
+<label>
+<input type="checkbox" id="pump2">
+Pump 2 (Zone B)
+</label>
+</div>
+
+<div class="zone">
+<label>
+<input type="checkbox" id="pump1A">
+Pump 1A (Backup)
+</label>
+</div>
+
+<div class="zone">
+<label>
+<input type="checkbox" id="pump2B">
+Pump 2B (Backup)
+</label>
+</div>
+
+</div>
+
+<!-- Zone A -->
+
+<div class="card">
+
+<h3>Organic Zone A</h3>
+
+<div class="zone">
+<label><input type="checkbox" id="valveA1"> Valve A1</label>
+</div>
+
+<div class="zone">
+<label><input type="checkbox" id="valveA2"> Valve A2</label>
+</div>
+
+<div class="zone">
+<label><input type="checkbox" id="valveA3"> Valve A3</label>
+</div>
+
+</div>
+
+<!-- Zone B -->
+
+<div class="card">
+
+<h3>Organic Zone B</h3>
+
+<div class="zone">
+<label><input type="checkbox" id="valveB1"> Valve B1</label>
+</div>
+
+<div class="zone">
+<label><input type="checkbox" id="valveB2"> Valve B2</label>
+</div>
+
+<div class="zone">
+<label><input type="checkbox" id="valveB3"> Valve B3</label>
+</div>
+
+</div>
+
+<!-- Environment -->
+
+<div class="card">
+
+<h3>Environment Monitor</h3>
+
+<div class="sensor">
+<span>🌡 Temperature</span>
+<span id="temp">32°C</span>
+</div>
+
+<div class="sensor">
+<span>💧 Humidity</span>
+<span id="hum">65%</span>
+</div>
+
+<div class="sensor">
+<span>🔋 Battery Solar</span>
+<span id="battery">92%</span>
+</div>
+
+</div>
+
+<!-- System Status -->
+
+<div class="card">
+
+<h3>System Status</h3>
+
+<div class="sensor">
+<span>Pump Status</span>
+<span id="systemPump" class="red">OFF</span>
+</div>
+
+<div class="sensor">
+<span>Selected Pump</span>
+<span id="selectedPump">None</span>
+</div>
+
+<div class="sensor">
+<span>Active Zones</span>
+<span id="activeZone">None</span>
+</div>
+
+</div>
+
+<button class="bigButton" onclick="startSystem()">
+START
+</button>
+
+<button class="stopButton" onclick="stopSystem()">
+STOP
+</button>
+
+</div>
+
+<div class="footer">
+Smart Farm Controller V1
+</div>
+
+<script>
+
+const pump1 = document.getElementById("pump1");
+const pump2 = document.getElementById("pump2");
+const pump1A = document.getElementById("pump1A");
+const pump2B = document.getElementById("pump2B");
+
+// Backup Pump 1
+pump1A.addEventListener("change", function(){
+
+    if(this.checked){
+        pump1.checked = false;
+    }
+
+});
+
+// Main Pump 1
+pump1.addEventListener("change", function(){
+
+    if(this.checked){
+        pump1A.checked = false;
+    }
+
+});
+
+// Backup Pump 2
+pump2B.addEventListener("change", function(){
+
+    if(this.checked){
+        pump2.checked = false;
+    }
+
+});
+
+// Main Pump 2
+pump2.addEventListener("change", function(){
+
+    if(this.checked){
+        pump2B.checked = false;
+    }
+
+});
+
+function random(min,max){
+
+    return Math.floor(Math.random()*(max-min+1))+min;
+
+}
+
+function startSystem(){
+
+    let pumps=[];
+    let zones=[];
+
+    // Pumps
+
+    if(pump1.checked) pumps.push("Pump 1");
+    if(pump2.checked) pumps.push("Pump 2");
+    if(pump1A.checked) pumps.push("Pump 1A Backup");
+    if(pump2B.checked) pumps.push("Pump 2B Backup");
+
+    // Zone A
+
+    if(document.getElementById("valveA1").checked) zones.push("A1");
+    if(document.getElementById("valveA2").checked) zones.push("A2");
+    if(document.getElementById("valveA3").checked) zones.push("A3");
+
+    // Zone B
+
+    if(document.getElementById("valveB1").checked) zones.push("B1");
+    if(document.getElementById("valveB2").checked) zones.push("B2");
+    if(document.getElementById("valveB3").checked) zones.push("B3");
+
+    if(pumps.length===0){
+        alert("Please select at least one pump");
+        return;
+    }
+
+    if(zones.length===0){
+        alert("Please select at least one zone");
+        return;
+    }
+
+    document.getElementById("systemPump").innerHTML="ON";
+    document.getElementById("systemPump").className="green";
+
+    document.getElementById("selectedPump").innerHTML=
+    pumps.join(", ");
+
+    document.getElementById("activeZone").innerHTML=
+    zones.join(", ");
+
+    document.getElementById("temp").innerHTML=
+    random(28,36)+"°C";
+
+    document.getElementById("hum").innerHTML=
+    random(55,90)+"%";
+
+    document.getElementById("battery").innerHTML=
+    random(60,100)+"%";
+
+}
+
+function stopSystem(){
+
+    document.getElementById("systemPump").innerHTML="OFF";
+    document.getElementById("systemPump").className="red";
+
+    document.getElementById("selectedPump").innerHTML="None";
+    document.getElementById("activeZone").innerHTML="None";
+
+    // Pumps
+
+    pump1.checked=false;
+    pump2.checked=false;
+    pump1A.checked=false;
+    pump2B.checked=false;
+
+    // Zone A
+
+    document.getElementById("valveA1").checked=false;
+    document.getElementById("valveA2").checked=false;
+    document.getElementById("valveA3").checked=false;
+
+    // Zone B
+
+    document.getElementById("valveB1").checked=false;
+    document.getElementById("valveB2").checked=false;
+    document.getElementById("valveB3").checked=false;
+
+}
+
+</script>
+
+</body>
+</html>
+</div>
